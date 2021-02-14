@@ -5,9 +5,9 @@ from distutils.util import strtobool
 
 import cv2
 
-from deep_sort.Deep_sort import DeepSort
-from deep_sort.detectron2_detection import Detectron2
-from deep_sort.util import draw_bboxes
+from .Deep_sort import DeepSort
+from .detectron2_detection import Detectron2
+from .util import draw_bboxes
 
 
 class Detector(object):
@@ -76,7 +76,7 @@ class Detector(object):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--deepsort_checkpoint", type=str, default="deep_sort/deep/checkpoint/ckpt.t7")
+    parser.add_argument("--deepsort_checkpoint", type=str, default="Wyze2_marauders_map\deep_sort\deep_sort\checkpoint\ckpt.t7")
     parser.add_argument("--max_dist", type=float, default=0.3)
     parser.add_argument("--ignore_display", dest="display", action="store_false")
     parser.add_argument("--display_width", type=int, default=800)
