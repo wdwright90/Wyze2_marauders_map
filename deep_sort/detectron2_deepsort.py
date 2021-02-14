@@ -9,14 +9,10 @@ from .Deep_sort import DeepSort
 from .detectron2_detection import Detectron2
 from .util import draw_bboxes
 
-
 class Detector(object):
     def __init__(self, args):
         self.args = args
         use_cuda = bool(strtobool(self.args.use_cuda))
-        if args.display:
-            cv2.namedWindow("test", cv2.WINDOW_NORMAL)
-            cv2.resizeWindow("test", args.display_width, args.display_height)
 
         self.vdo = cv2.VideoCapture()
         self.detectron2 = Detectron2()
@@ -47,7 +43,7 @@ class Detector(object):
             # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
             bbox_xcycwh, cls_conf, cls_ids = self.detectron2.detect(im)
 
-            if bbox_xcycwh is not None:
+            if len(bbox_xcycwh) is not 0:
                 # select class person
                 mask = cls_ids == 0
 
@@ -64,13 +60,8 @@ class Detector(object):
             end = time.time()
             print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
 
-            if self.args.display:
-                cv2.imshow("test", im)
-                cv2.waitKey(1)
-
             if self.args.save_path:
                 self.output.write(im)
-            # exit(0)
 
 
 def parse_args():
@@ -81,7 +72,7 @@ def parse_args():
     parser.add_argument("--ignore_display", dest="display", action="store_false")
     parser.add_argument("--display_width", type=int, default=800)
     parser.add_argument("--display_height", type=int, default=600)
-    parser.add_argument("--save_path", type=str, default="demo.avi")
+    parser.add_argument("--save_path", type=str, default="demo.MP4")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()
 
