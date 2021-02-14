@@ -1,10 +1,10 @@
 # Deep SORT with Pytorch
 
-Demo
-Clone this repository: git clone https://github.com/wdwright90/Wyze2_marauders_map.git
-Install detectron2: cd /content/Wyze2_marauders_map/Detection_model then pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.7/index.html
-Install deepsort requirements: cd /content/Wyze2_marauders_map/deep_sort then pip install -r requirement.txt
-Run the demo: 
+## Demo
+1.Clone this repository: `git clone https://github.com/wdwright90/Wyze2_marauders_map.git`
+2.Install detectron2: `cd /content/Wyze2_marauders_map/Detection_mode` then `pip install detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.7/index.html`
+3.Install deepsort requirements: `cd /content/Wyze2_marauders_map/deep_sort` then `pip install -r requirement.txt`
+4.Run the demo: 
 
 ## Citing DeepSORT
 
