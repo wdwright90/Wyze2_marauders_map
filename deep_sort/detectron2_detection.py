@@ -1,11 +1,11 @@
-import Detection_model
-from Detection_model.detectron2.detectron2.utils.logger import setup_logger
+import detectron2
+from detectron2.utils.logger import setup_logger
 setup_logger()
 
 import numpy as np
-from Detection_model.detectron2.detectron2.engine import DefaultPredictor
-from Detection_model.detectron2.detectron2.config import get_cfg
-from Detection_model.detectron2.detectron2 import model_zoo
+from detectron2.engine import DefaultPredictor
+from detectron2.config import get_cfg
+from detectron2 import model_zoo
 
 
 class Detectron2:
