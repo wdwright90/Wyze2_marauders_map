@@ -53,9 +53,6 @@ class Net(nn.Module):
             nn.Conv2d(3,64,3,stride=1,padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-            # nn.Conv2d(32,32,3,stride=1,padding=1),
-            # nn.BatchNorm2d(32),
-            # nn.ReLU(inplace=True),
             nn.MaxPool2d(3,2,padding=1),
         )
         # 32 64 32
@@ -97,6 +94,3 @@ class Net(nn.Module):
 
 if __name__ == '__main__':
     net = Net()
-    x = torch.randn(4,3,128,64)
-    y = net(x)
-    import ipdb; ipdb.set_trace()
