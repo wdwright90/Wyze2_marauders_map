@@ -37,6 +37,7 @@ class Detector(object):
             print(exc_type, exc_value, exc_traceback)
 
     def detect(self):
+        count = 0
         while self.vdo.grab():
             start = time.time()
             _, im = self.vdo.retrieve()
@@ -55,11 +56,15 @@ class Detector(object):
                 if len(outputs) > 0:
                     bbox_xyxy = outputs[:, :4]
                     identities = outputs[:, -1]
+                    for i in range(len(identities)):
+                        x1,y1,x2,y2 = bbox_xyxy[i]
+                        im_crop = im[y1:y2,x1:x2]
+                        cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
+                        count += 1
                     im = draw_bboxes(im, bbox_xyxy, identities)
 
             end = time.time()
             print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
-
             if self.args.save_path:
                 self.output.write(im)
 

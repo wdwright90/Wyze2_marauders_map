@@ -103,7 +103,6 @@ def train(epoch):
             ))
             training_loss = 0.
             start = time.time()
-
     return train_loss/len(trainloader), 1.- correct/total
 
 def test(epoch):
