@@ -8,15 +8,9 @@ import numpy as np
 import cv2
 import my_eval_script
 
-<<<<<<< HEAD
 from Deep_sort import DeepSort
 from detectron2_detection import Detectron2
 from util import draw_bboxes
-=======
-from .Deep_sort import DeepSort
-from .detectron2_detection import Detectron2
-from .util import draw_bboxes
->>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
 
 class Detector(object):
     def __init__(self, args):
@@ -50,11 +44,7 @@ class Detector(object):
 
     def detect(self):
         count = 0
-<<<<<<< HEAD
         identities_and_images = {}
-        raw_images = []
-=======
->>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
         while self.vdo.grab():
             start = time.time()
             _, im = self.vdo.retrieve()
@@ -77,7 +67,6 @@ class Detector(object):
                     for i in range(len(identities)):
                         x1,y1,x2,y2 = bbox_xyxy[i]
                         im_crop = im[y1:y2,x1:x2]
-<<<<<<< HEAD
                         im_crop = np.asarray(im_crop)
                         #cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
                         count += 1
@@ -93,19 +82,17 @@ class Detector(object):
         print(matched_ids)
 
         #Write images only when finished
-        if self.args.save_path:
-            im = draw_bboxes(im, bbox_xyxy, identities)
-            self.output.write(im)
-=======
-                        cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
-                        count += 1
-                    im = draw_bboxes(im, bbox_xyxy, identities)
-
-            end = time.time()
-            print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
-            if self.args.save_path:
-                self.output.write(im)
->>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
+        
+        #if self.args.save_path:
+        #    im = draw_bboxes(im, bbox_xyxy, identities)
+        #    self.output.write(im)
+        #        count += 1
+        #        im = draw_bboxes(im, bbox_xyxy, identities)
+        #
+        #    end = time.time()
+        #    print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
+        #    if self.args.save_path:
+        #        self.output.write(im)
 
 
 def parse_args():
