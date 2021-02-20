@@ -1,13 +1,22 @@
+
 import argparse
 import os
 import time
 from distutils.util import strtobool
+import numpy as np
 
 import cv2
+import my_eval_script
 
+<<<<<<< HEAD
+from Deep_sort import DeepSort
+from detectron2_detection import Detectron2
+from util import draw_bboxes
+=======
 from .Deep_sort import DeepSort
 from .detectron2_detection import Detectron2
 from .util import draw_bboxes
+>>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
 
 class Detector(object):
     def __init__(self, args):
@@ -36,8 +45,16 @@ class Detector(object):
         if exc_type:
             print(exc_type, exc_value, exc_traceback)
 
+    def reid():
+      pass
+
     def detect(self):
         count = 0
+<<<<<<< HEAD
+        identities_and_images = {}
+        raw_images = []
+=======
+>>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
         while self.vdo.grab():
             start = time.time()
             _, im = self.vdo.retrieve()
@@ -53,12 +70,33 @@ class Detector(object):
 
                 cls_conf = cls_conf[mask]
                 outputs = self.deepsort.update(bbox_xcycwh, cls_conf, im)
+                
                 if len(outputs) > 0:
                     bbox_xyxy = outputs[:, :4]
                     identities = outputs[:, -1]
                     for i in range(len(identities)):
                         x1,y1,x2,y2 = bbox_xyxy[i]
                         im_crop = im[y1:y2,x1:x2]
+<<<<<<< HEAD
+                        im_crop = np.asarray(im_crop)
+                        #cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
+                        count += 1
+                        if identities[i] in identities_and_images:
+                          identities_and_images[identities[i]].append(im_crop)
+                        else:
+                          identities_and_images[identities[i]] = [im_crop]
+
+            end = time.time()
+            print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
+
+        matched_ids = my_eval_script.eval_cam(identities_and_images)
+        print(matched_ids)
+
+        #Write images only when finished
+        if self.args.save_path:
+            im = draw_bboxes(im, bbox_xyxy, identities)
+            self.output.write(im)
+=======
                         cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
                         count += 1
                     im = draw_bboxes(im, bbox_xyxy, identities)
@@ -67,12 +105,13 @@ class Detector(object):
             print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
             if self.args.save_path:
                 self.output.write(im)
+>>>>>>> 6c46bb25c172a9972500125ae89adc05c4e73308
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--deepsort_checkpoint", type=str, default="Wyze2_marauders_map\deep_sort\deep_sort\checkpoint\ckpt.t7")
+    parser.add_argument("--deepsort_checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
     parser.add_argument("--max_dist", type=float, default=0.3)
     parser.add_argument("--ignore_display", dest="display", action="store_false")
     parser.add_argument("--display_width", type=int, default=800)

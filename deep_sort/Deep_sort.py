@@ -1,10 +1,10 @@
 import numpy as np
 
-from .model.feature_extractor import Extractor
-from .deep_sort.nn_matching import NearestNeighborDistanceMetric
-from .deep_sort.NMS import non_max_suppression
-from .deep_sort.detection import Detection
-from .deep_sort.tracker import Tracker
+from model.feature_extractor import Extractor
+from deep_sort.nn_matching import NearestNeighborDistanceMetric
+from deep_sort.NMS import non_max_suppression
+from deep_sort.detection import Detection
+from deep_sort.tracker import Tracker
 
 
 __all__ = ['DeepSort']
