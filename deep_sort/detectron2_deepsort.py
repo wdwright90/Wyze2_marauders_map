@@ -77,8 +77,8 @@ class Detector(object):
 
             end = time.time()
             print("time: {}s, fps: {}".format(end - start, 1 / (end - start)))
-
-        matched_ids = my_eval_script.eval_cam(identities_and_images)
+        cam_num = 2
+        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num)
         print(matched_ids)
 
         #Write images only when finished
