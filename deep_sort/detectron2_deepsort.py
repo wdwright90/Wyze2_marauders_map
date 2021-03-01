@@ -14,24 +14,25 @@ from detectron2_detection import Detectron2
 from util import draw_bboxes
 
 class Detector(object):
-    def __init__(self, args):
+    def __init__(self, args,vpath,spath):
         self.args = args
         use_cuda = bool(strtobool(self.args.use_cuda))
-
+        self.vpath = vpath
+        self.spath = spath
         self.vdo = cv2.VideoCapture()
         self.detectron2 = Detectron2()
 
         self.deepsort = DeepSort(args.deepsort_checkpoint, use_cuda=use_cuda)
 
     def __enter__(self):
-        assert os.path.isfile(self.args.VIDEO_PATH), "Error: path error"
-        self.vdo.open(self.args.VIDEO_PATH)
+        assert os.path.isfile(self.vpath), "Error: path error"
+        self.vdo.open(self.vpath)
         self.im_width = int(self.vdo.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.im_height = int(self.vdo.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        if self.args.save_path:
+        if self.spath:
             fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-            self.output = cv2.VideoWriter(self.args.save_path, fourcc, 20, (self.im_width, self.im_height))
+            self.output = cv2.VideoWriter(self.spath, fourcc, 15, (self.im_width, self.im_height))
 
         assert self.vdo.isOpened()
         return self
@@ -50,7 +51,7 @@ class Detector(object):
         store_ids = []
         store_out = []
         identities_and_images = {}
-        cam_num = int(re.findall(r'\d+', self.args.VIDEO_PATH)[1])
+        cam_num = int(re.findall(r'\d+', self.vpath)[1])
         while self.vdo.grab():
             _, im = self.vdo.retrieve()
             store_im.append(im)
@@ -106,7 +107,7 @@ class Detector(object):
                             if old_id == identities[i]:
                                 identities[i] = new_id
                     im = draw_bboxes(im, bbox_xyxy, identities)
-            if self.args.save_path:
+            if self.spath:
                 self.output.write(im)
         #Write images only when finished
 
@@ -130,12 +131,118 @@ def parse_args():
     parser.add_argument("--ignore_display", dest="display", action="store_false")
     parser.add_argument("--display_width", type=int, default=800)
     parser.add_argument("--display_height", type=int, default=600)
-    parser.add_argument("--save_path", type=str, default="demo.avi")
+    parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    with Detector(args) as det:
-        det.detect()
+    spath = []
+    vpath = args.VIDEO_PATH.split('_next')
+    n = len(vpath)
+    for i in range(n):
+        spath.append(os.path.join(args.save_path,'example{}.avi'.format(i)))
+    for i in range(n):
+        with Detector(args,vpath[i],spath[i]) as det:
+            det.detect()
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    if n == 1:
+        print('Only one videos')
+    elif n == 2:
+        videoLeft = cv2.VideoCapture(spath[0])
+        videoRight = cv2.VideoCapture(spath[1])
+        fps = videoLeft.get(cv2.CAP_PROP_FPS)
+        width = (int(videoLeft.get(cv2.CAP_PROP_FRAME_WIDTH)))
+        height = (int(videoLeft.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+
+        videoWriter = cv2.VideoWriter('/content/videos.avi', fourcc, fps, (width, height))
+
+        successLeft, frameLeft = videoLeft.read()
+        successRight, frameRight = videoRight.read()
+
+        while successLeft and successRight:
+            frameLeft = cv2.resize(frameLeft, (int(width / 2), height), interpolation=cv2.INTER_CUBIC)
+            frameRight = cv2.resize(frameRight, (int(width / 2), height), interpolation=cv2.INTER_CUBIC)
+
+            frame = np.hstack((frameLeft, frameRight))
+
+            videoWriter.write(frame)
+            successLeft, frameLeft = videoLeft.read()
+            successRight, frameRight = videoRight.read()
+
+        videoWriter.release()
+        videoLeft.release()
+        videoRight.release()
+    elif n == 3:
+        videoLeftUp = cv2.VideoCapture(spath[0])
+        videoLeftDown = cv2.VideoCapture(spath[1])
+        videoRightUp = cv2.VideoCapture(spath[2])
+        fps = videoLeftUp.get(cv2.CAP_PROP_FPS)
+        width = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_WIDTH)))
+        height = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+
+        videoWriter = cv2.VideoWriter('/content/videos1.avi', fourcc, fps, (width, height))
+
+        successLeftUp, frameLeftUp = videoLeftUp.read()
+        successLeftDown , frameLeftDown = videoLeftDown.read()
+        successRightUp, frameRightUp = videoRightUp.read()
+
+        while successLeftUp and successLeftDown and successRightUp and successRightDown:
+            frameLeftUp = cv2.resize(frameLeftUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameLeftDown = cv2.resize(frameLeftDown, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameRightUp = cv2.resize(frameRightUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+
+            frameUp = np.hstack((frameLeftUp, frameRightUp))
+            frameDown = np.hstack((frameLeftDown, 0))
+            frame = np.vstack((frameUp, frameDown))
+
+            videoWriter.write(frame)
+            successLeftUp, frameLeftUp = videoLeftUp.read()
+            successLeftDown, frameLeftDown = videoLeftDown.read()
+            successRightUp, frameRightUp = videoRightUp.read()
+
+        videoWriter.release()
+        videoLeftUp.release()
+        videoLeftDown.release()
+        videoRightUp.release()
+    elif n == 4:
+        videoLeftUp = cv2.VideoCapture(spath[0])
+        videoLeftDown = cv2.VideoCapture(spath[2])
+        videoRightUp = cv2.VideoCapture(spath[1])
+        videoRightDown = cv2.VideoCapture(spath[3])
+        fps = videoLeftUp.get(cv2.CAP_PROP_FPS)
+
+        width = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_WIDTH)))
+        height = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+
+        videoWriter = cv2.VideoWriter('/content/videos.avi', fourcc, fps, (width, height))
+
+        successLeftUp, frameLeftUp = videoLeftUp.read()
+        successLeftDown , frameLeftDown = videoLeftDown.read()
+        successRightUp, frameRightUp = videoRightUp.read()
+        successRightDown, frameRightDown = videoRightDown.read()
+
+        while successLeftUp and successLeftDown and successRightUp and successRightDown:
+            frameLeftUp = cv2.resize(frameLeftUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameLeftDown = cv2.resize(frameLeftDown, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameRightUp = cv2.resize(frameRightUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameRightDown = cv2.resize(frameRightDown, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+
+            frameUp = np.hstack((frameLeftUp, frameRightUp))
+            frameDown = np.hstack((frameLeftDown, frameRightDown))
+            frame = np.vstack((frameUp, frameDown))
+
+            videoWriter.write(frame)
+            successLeftUp, frameLeftUp = videoLeftUp.read()
+            successLeftDown, frameLeftDown = videoLeftDown.read()
+            successRightUp, frameRightUp = videoRightUp.read()
+            successRightDown, frameRightDown = videoRightDown.read()
+
+        videoWriter.release()
+        videoLeftUp.release()
+        videoLeftDown.release()
+        videoRightUp.release()
+        videoRightDown.release()
+    else:
+        print('Too many videos!')
