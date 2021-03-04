@@ -1,4 +1,3 @@
-
 import argparse
 import os
 import time
@@ -147,6 +146,8 @@ if __name__ == "__main__":
         with Detector(args,vpath[i],spath[i]) as det:
             det.detect()
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    newpath = os.path.join(args.save_path,'videos.avi')
+    print('Integrating {} videos processing...'.format(n))
     if n == 1:
         print('Only one videos')
     elif n == 2:
@@ -156,16 +157,25 @@ if __name__ == "__main__":
         width = (int(videoLeft.get(cv2.CAP_PROP_FRAME_WIDTH)))
         height = (int(videoLeft.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-        videoWriter = cv2.VideoWriter('/content/videos.avi', fourcc, fps, (width, height))
+        videoWriter = cv2.VideoWriter(newpath, fourcc, fps, (width, height))
 
         successLeft, frameLeft = videoLeft.read()
         successRight, frameRight = videoRight.read()
+        target = np.zeros((height,width),dtype=np.uint8)
 
+        frame = cv2.cvtColor(target, cv2.COLOR_GRAY2BGR)
         while successLeft and successRight:
-            frameLeft = cv2.resize(frameLeft, (int(width / 2), height), interpolation=cv2.INTER_CUBIC)
-            frameRight = cv2.resize(frameRight, (int(width / 2), height), interpolation=cv2.INTER_CUBIC)
+            frameLeft = cv2.resize(frameLeft, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            frameRight = cv2.resize(frameRight, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
+            image = np.hstack((frameLeft, frameRight))
+            h = image.shape[0]
+            w = image.shape[1]
 
-            frame = np.hstack((frameLeft, frameRight))
+            for i in range(h/2):
+                for j in range(w):
+                    frame[i, j, 0] = image[i, j, 0]
+                    frame[i, j, 1] = image[i, j, 1]
+                    frame[i, j, 2] = image[i, j, 2]
 
             videoWriter.write(frame)
             successLeft, frameLeft = videoLeft.read()
@@ -182,20 +192,35 @@ if __name__ == "__main__":
         width = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_WIDTH)))
         height = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-        videoWriter = cv2.VideoWriter('/content/videos1.avi', fourcc, fps, (width, height))
+        videoWriter = cv2.VideoWriter(newpath, fourcc, fps, (width, height))
 
         successLeftUp, frameLeftUp = videoLeftUp.read()
         successLeftDown , frameLeftDown = videoLeftDown.read()
         successRightUp, frameRightUp = videoRightUp.read()
 
-        while successLeftUp and successLeftDown and successRightUp and successRightDown:
+        target = np.zeros((height,width),dtype=np.uint8)
+
+        frame = cv2.cvtColor(target, cv2.COLOR_GRAY2BGR)
+        while successLeftUp and successLeftDown and successRightUp:
             frameLeftUp = cv2.resize(frameLeftUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
             frameLeftDown = cv2.resize(frameLeftDown, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
             frameRightUp = cv2.resize(frameRightUp, (int(width / 2), int(height / 2)), interpolation=cv2.INTER_CUBIC)
 
-            frameUp = np.hstack((frameLeftUp, frameRightUp))
-            frameDown = np.hstack((frameLeftDown, 0))
-            frame = np.vstack((frameUp, frameDown))
+            imageup = np.hstack((frameLeftUp, frameRightUp))
+            h = imageup.shape[0]
+            w = imageup.shape[1]
+
+            for i in range(h):
+                for j in range(w):
+
+                    frame[i, j, 0] = imageup[i, j, 0]
+                    frame[i, j, 1] = imageup[i, j, 1]
+                    frame[i, j, 2] = imageup[i, j, 2]
+            for i in range(h,2*h):
+                for j in range(int(w/2)):
+                    frame[i, j, 0] = frameLeftDown[i-h, j, 0]
+                    frame[i, j, 1] = frameLeftDown[i-h, j, 1]
+                    frame[i, j, 2] = frameLeftDown[i-h, j, 2]
 
             videoWriter.write(frame)
             successLeftUp, frameLeftUp = videoLeftUp.read()
@@ -216,7 +241,7 @@ if __name__ == "__main__":
         width = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_WIDTH)))
         height = (int(videoLeftUp.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
-        videoWriter = cv2.VideoWriter('/content/videos.avi', fourcc, fps, (width, height))
+        videoWriter = cv2.VideoWriter(newpath, fourcc, fps, (width, height))
 
         successLeftUp, frameLeftUp = videoLeftUp.read()
         successLeftDown , frameLeftDown = videoLeftDown.read()

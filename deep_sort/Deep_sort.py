@@ -13,7 +13,7 @@ __all__ = ['DeepSort']
 class DeepSort(object):
     def __init__(self, model_path, max_dist=0.2, use_cuda=True):
         self.min_confidence = 0.3
-        self.nms_max_overlap = 1.0
+        self.nms_max_overlap = 0.4
 
         self.extractor = Extractor(model_path, use_cuda=use_cuda)
 
