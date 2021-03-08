@@ -171,7 +171,7 @@ if __name__ == "__main__":
             h = image.shape[0]
             w = image.shape[1]
 
-            for i in range(h/2):
+            for i in range(int(h/2)):
                 for j in range(w):
                     frame[i, j, 0] = image[i, j, 0]
                     frame[i, j, 1] = image[i, j, 1]

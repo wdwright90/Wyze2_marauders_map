@@ -75,7 +75,9 @@ def eval_cam(image_dict, current_cam):
   #Next we check if the saved features directory is empty
   old_saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
   old_num_saved_features_vectors = len(old_saved_features_vectors)
+  used_id = []
   for identity in image_dict:
+    print(identity)
     matched_id = (identity, identity) #matched identity tuple, deepsort at pos 0 and reid at pos 1
     features = extractor(image_dict[identity])
     qf = torch.mean(features, 0)
@@ -104,11 +106,13 @@ def eval_cam(image_dict, current_cam):
         pid_num = int(re.findall(r'\d+', pid)[0])
         camid_num = int(re.findall(r'\d+', camid)[0])
         if (dist < smallest_dist_diff_cam and current_cam != camid_num):
-          smallest_dist_diff_cam = dist
-          closest_pid_diff_cam = pid_num
+          if pid_num not in used_id:
+            smallest_dist_diff_cam = dist
+            closest_pid_diff_cam = pid_num
         if (dist < smallest_dist_same_cam and current_cam == camid_num):
-          smallest_dist_same_cam = dist
-          closest_pid_same_cam = pid_num
+          if pid_num not in used_id:
+            smallest_dist_same_cam = dist
+            closest_pid_same_cam = pid_num
       if (smallest_dist_diff_cam > new_pid_threshold_diff_cam and smallest_dist_same_cam > new_pid_threshold_same_cam):
         #This must be a new identity
         print("Created a new identity, both thresholds were exceeded")
@@ -119,12 +123,14 @@ def eval_cam(image_dict, current_cam):
         save_location_and_name = osp.join('/content/Wyze2_marauders_map/saved_features', 'features_pid{}_cam{}_track{}.pt'.format(closest_pid_diff_cam, current_cam, num_saved_features_vectors))
         torch.save(qf, save_location_and_name)
         matched_id = (identity, closest_pid_diff_cam)
+        used_id.append(closest_pid_diff_cam)
       else:
         print("hit the else, matched to closest cam")
         #This is a matching identity, save it with the matched id instead of deepsort id
         save_location_and_name = osp.join('/content/Wyze2_marauders_map/saved_features', 'features_pid{}_cam{}_track{}.pt'.format(closest_pid_same_cam, current_cam, num_saved_features_vectors))
         torch.save(qf, save_location_and_name)
         matched_id = (identity, closest_pid_same_cam) #In this case we must change the matched id
+        used_id.append(closest_pid_same_cam)
     matched_ids.append(matched_id) #append the matched identity to our output list
   #Finally we return the matched ids for usage by the 
   return matched_ids
