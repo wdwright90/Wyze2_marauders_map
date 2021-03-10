@@ -26,17 +26,17 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
     accs = []
     for cam in cams:
         for seq in seqs:
-            logger.info('start cam: {}, seq: {}'.format(cam,seq))
+            logger.info('start cam: {} seq: {}'.format(cam,seq))
             result_filename = osp.join(result_root, '{}_{}.txt'.format(cam, seq))
-            video_path = []
+            # video_path = []
             # for i in range(len(os.listdir(osp.join(data_root, cam, seq)))-1):
-            #     video_path.append(data_root + "/" + cam + "/" + seq + "{}_{}_".fotmat(i))
-
+            #
+            video_path = data_root + '/' + cam + '/' + seq + '/{}_{}_0.mp4'.format(cam,seq)
             with Detector(args, video_path) as det:
                 det.detect()
 
             # eval
-            logger.info('Evaluate cam: {}, seq: {}'.format(cam, seq))
+            logger.info('Evaluate cam: {} seq: {}'.format(cam,seq))
             evaluator = Evaluator(data_root, cam, seq, data_type)
             accs.append(evaluator.eval_file(result_filename))
 
@@ -55,7 +55,10 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_path", type=str, default="/content/demo.avi")
+    parser.add_argument('--deepsort_checkpoint', type=str, default='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7')
+    parser.add_argument('--save_path', type=str, default='/content/evaluation')
+    parser.add_argument('--use_cuda', type=str, default='True')
+    parser.add_argument('--frame_interval', type=int, default=1)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -68,16 +71,15 @@ if __name__ == '__main__':
                 Cam4
                 Cam5
                 '''
-    seqs_str = '''Seq0      
+    seqs_str = '''      
+                  Seq0      
                   Seq1
                   Seq2
                   Seq3
                   Seq4
                   '''
     data_root = '/content/Wyze2_marauders_map/data/VideoData'
-
+    cams = [cams.strip() for cams in cams_str.split()]
     seqs = [seq.strip() for seq in seqs_str.split()]
 
-    main(data_root=data_root,
-         seqs=seqs,
-         args=args)
+    main(data_root=data_root,cams=cams,seqs=seqs,args=args)

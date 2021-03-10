@@ -2,10 +2,9 @@ import argparse
 import os
 import time
 from distutils.util import strtobool
-
 import cv2
-
-from deep_sort import DeepSort
+import numpy as np
+from Deep_sort import DeepSort
 from detectron2_detection import Detectron2
 from util import draw_bboxes
 from utils.log import get_logger
@@ -37,7 +36,7 @@ class Detector(object):
             self.save_results_path = os.path.join(self.args.save_path, "results.txt")
 
             fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-            self.output = cv2.VideoWriter(self.args.save_path, fourcc, 20, (self.im_width, self.im_height))
+            self.output = cv2.VideoWriter(self.args.save_path, fourcc, 15, (self.im_width, self.im_height))
 
             self.logger.info("Save results to {}".format(self.args.save_path))
 
@@ -59,8 +58,8 @@ class Detector(object):
             start = time.time()
             _, im = self.vdo.retrieve()
             bbox_xcycwh, cls_conf, cls_ids = self.detectron2.detect(im)
-
-            if bbox_xcycwh is not None:
+            outputs = []
+            if len(bbox_xcycwh) is not 0:
                 # select class person
                 mask = cls_ids == 0
 
