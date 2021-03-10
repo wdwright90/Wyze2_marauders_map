@@ -183,6 +183,5 @@ def main():
         if (epoch+1)%20==0:
             lr_decay()
 
-
 if __name__ == '__main__':
     main()
