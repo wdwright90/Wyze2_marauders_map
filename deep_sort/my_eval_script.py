@@ -62,18 +62,18 @@ def eval_cam(image_dict, current_cam):
   matched_ids = []#This is our return vector which will hold all our matched ids
   extractor = FeatureExtractor(
     model_name='osnet_x1_0',
-    model_path='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/model.pth.tar-10',
+    model_path='/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/model.pth.tar-10',
     device='cuda'
   )
 
   #First we check if the saved features dir exists and create it otherwise
-  if not os.path.isdir('/content/Wyze2_marauders_map/saved_features'):
-    os.mkdir('/content/Wyze2_marauders_map/saved_features')
+  if not os.path.isdir('/Wyze2_marauders_map/saved_features'):
+    os.mkdir('/Wyze2_marauders_map/saved_features')
 
   #Could be this image list but also could just be
   image_list = []
   #Next we check if the saved features directory is empty
-  old_saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
+  old_saved_features_vectors = glob.glob(osp.join('/Wyze2_marauders_map/saved_features', '*.pt'))
   old_num_saved_features_vectors = len(old_saved_features_vectors)
   used_id = []
   for identity in image_dict:
@@ -81,9 +81,9 @@ def eval_cam(image_dict, current_cam):
     matched_id = (identity, identity) #matched identity tuple, deepsort at pos 0 and reid at pos 1
     features = extractor(image_dict[identity])
     qf = torch.mean(features, 0)
-    saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
+    saved_features_vectors = glob.glob(osp.join('/Wyze2_marauders_map/saved_features', '*.pt'))
     num_saved_features_vectors = len(saved_features_vectors)
-    save_location_and_name = osp.join('/content/Wyze2_marauders_map/saved_features', 'features_pid{}_cam{}_track{}.pt'.format(identity, current_cam, num_saved_features_vectors))
+    save_location_and_name = osp.join('/Wyze2_marauders_map/saved_features', 'features_pid{}_cam{}_track{}.pt'.format(identity, current_cam, num_saved_features_vectors))
     if old_num_saved_features_vectors < 1:
       #This means saved features directory is empty, save our current feature vector
       torch.save(qf, save_location_and_name)

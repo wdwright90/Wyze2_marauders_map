@@ -20,7 +20,7 @@ class Detector(object):
         self.vdo = cv2.VideoCapture()
         self.detectron2 = Detectron2()
 
-        self.deepsort = DeepSort(args.deepsort_checkpoint, use_cuda=use_cuda)
+        self.deepsort = DeepSort(args.checkpoint, use_cuda=use_cuda)
 
     def __enter__(self):
         assert os.path.isfile(self.video_path), "Error: path error"
@@ -87,7 +87,7 @@ class Detector(object):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--deepsort_checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
+    parser.add_argument("--checkpoint", type=str, default="/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()

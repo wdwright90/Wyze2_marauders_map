@@ -29,10 +29,8 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
         for seq in seqs:
             logger.info('start cam: {} seq: {}'.format(cam, seq))
             result_filename = osp.join(result_root, '{}_{}.txt'.format(cam, seq))
-            # video_path = []
-            # for i in range(len(os.listdir(osp.join(data_root, cam, seq)))-1):
-            #
-            video_path = data_root + '/' + cam + '/' + seq + '/{}_{}_0.mp4'.format(cam, seq)
+
+            video_path = data_root + '/' + cam + '/' + seq + '/{}_{}.mp4'.format(cam, seq)
             with Detector(args, video_path) as det:
                 det.detect()
 
@@ -61,9 +59,8 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--deepsort_checkpoint', type=str,
-                        default='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7')
-    parser.add_argument('--save_path', type=str, default='/content/evaluation')
+    parser.add_argument('--checkpoint', type=str,default='/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7')
+    parser.add_argument('--save_path', type=str, default='/Wyze2_marauders_map/evaluation')
     parser.add_argument('--use_cuda', type=str, default='True')
     return parser.parse_args()
 
@@ -72,8 +69,7 @@ if __name__ == '__main__':
     args = parse_args()
     cams_str = '''
                 Cam0
-                Cam1
-                Cam2
+
 
                 '''
     seqs_str = '''      
@@ -83,7 +79,7 @@ if __name__ == '__main__':
                   Seq3
                   Seq4
                   '''
-    data_root = '/content/Wyze2_marauders_map/data/VideoData'
+    data_root = '/Wyze2_marauders_map/data/VideoData'
     cams = [cams.strip() for cams in cams_str.split()]
     seqs = [seq.strip() for seq in seqs_str.split()]
 

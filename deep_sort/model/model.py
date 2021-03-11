@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 class BasicBlock(nn.Module):
     def __init__(self, c_in, c_out,is_downsample=False):
@@ -34,7 +33,7 @@ class BasicBlock(nn.Module):
         y = self.bn2(y)
         if self.is_downsample:
             x = self.downsample(x)
-        return F.relu(x.add(y),True)
+        return torch.nn.functional.relu(x.add(y),True)
 
 def make_layers(c_in,c_out,repeat_times, is_downsample=False):
     blocks = []
