@@ -3,7 +3,7 @@ import numpy as np
 import copy
 import motmetrics as mm
 mm.lap.default_solver = 'lap'
-from deep_sort.utils.io import read_results, unzip_objs
+from utils.io import read_results, unzip_objs
 
 
 class Evaluator(object):
@@ -56,7 +56,9 @@ class Evaluator(object):
 
         # get distance matrix
         iou_distance = mm.distances.iou_matrix(gt_tlwhs, trk_tlwhs, max_iou=0.5)
-
+        print('iou',iou_distance)
+        print('gt',gt_tlwhs)
+        print('trk',trk_tlwhs)
         # acc
         self.acc.update(gt_ids, trk_ids, iou_distance)
 
