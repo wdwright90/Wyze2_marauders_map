@@ -3,7 +3,6 @@ import os
 import time
 from distutils.util import strtobool
 import cv2
-import numpy as np
 from Deep_sort import DeepSort
 from detectron2_detection import Detectron2
 from util import draw_bboxes
@@ -11,10 +10,11 @@ from utils.log import get_logger
 from utils.io import write_results
 
 class Detector(object):
-    def __init__(self, args, video_path):
+    def __init__(self, args, video_path, result_filename):
         self.args = args
         self.video_path = video_path
         self.logger = get_logger("root")
+        self.result_filename = result_filename
         use_cuda = bool(strtobool(self.args.use_cuda))
 
         self.vdo = cv2.VideoCapture()
@@ -76,18 +76,18 @@ class Detector(object):
                         bbox_tlwh.append(self.deepsort._xyxy_to_tlwh(bb_xyxy))
                     results.append((idx_frame - 1, bbox_tlwh, identities))
 
-            end = time.time()
+                end = time.time()
 
-            if self.args.save_path:
-                self.output.write(im)
-            write_results(self.save_results_path, results, 'mot')
-            self.logger.info("time: {:.03f}s, fps: {:.03f}, detection numbers: {}, tracking numbers: {}" \
-                             .format(end - start, 1 / (end - start), bbox_xcycwh.shape[0], len(outputs)))
+                if self.args.save_path:
+                    self.output.write(im)
+                write_results(self.result_filename, results, 'mot')
+                self.logger.info("time: {:.03f}s, fps: {:.03f}, detection numbers: {}, tracking numbers: {}" \
+                                .format(end - start, 1 / (end - start), bbox_xcycwh.shape[0], len(outputs)))
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--checkpoint", type=str, default="/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
+    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()
@@ -95,5 +95,6 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    with Detector(args, video_path=args.VIDEO_PATH) as det:
+    result_filename = '/content/'
+    with Detector(args=args, video_path=args.VIDEO_PATH, result_filename=result_filename) as det:
         det.detect()
