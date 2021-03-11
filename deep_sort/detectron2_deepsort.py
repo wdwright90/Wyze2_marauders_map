@@ -51,9 +51,7 @@ class Detector(object):
         results = []
         idx_frame = 0
         while self.vdo.grab():
-            idx_frame += 1
-            if idx_frame % self.args.frame_interval:
-                continue
+
 
             start = time.time()
             _, im = self.vdo.retrieve()
@@ -61,6 +59,7 @@ class Detector(object):
             outputs = []
             if len(bbox_xcycwh) is not 0:
                 # select class person
+                idx_frame += 1
                 mask = cls_ids == 0
 
                 bbox_xcycwh = bbox_xcycwh[mask]
