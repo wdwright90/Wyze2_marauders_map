@@ -20,7 +20,7 @@ class Detector(object):
         self.vdo = cv2.VideoCapture()
         self.detectron2 = Detectron2()
 
-        self.deepsort = DeepSort(args.deepsort_checkpoint, use_cuda=use_cuda)
+        self.deepsort = DeepSort(args.checkpoint, use_cuda=use_cuda)
 
     def __enter__(self):
         assert os.path.isfile(self.vpath), "Error: path error"
@@ -69,7 +69,7 @@ class Detector(object):
                 bbox_xcycwh[:, 3:] *= 1.2
 
                 cls_conf = cls_conf[mask]
-                outputs = self.deepsort.update(bbox_xcycwh, cls_conf, im)
+                outputs = self.deepsort.update(bbox_xcycwh, cls_conf, im, cam_num)
                 store_out.append(outputs)
                 if len(outputs) > 0:
                     bbox_xyxy = outputs[:, :4]
@@ -83,7 +83,7 @@ class Detector(object):
                             identities_and_images[identities[i]].append(im_crop)
                         else:
                             identities_and_images[identities[i]] = [im_crop]
-        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num)
+        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num, flag = 0)
         print(matched_ids)
         # loop for generate video with matched_ids
         for i in range(len(store_im)):
@@ -124,7 +124,7 @@ class Detector(object):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--deepsort_checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
+    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()

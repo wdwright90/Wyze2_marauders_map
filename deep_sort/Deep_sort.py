@@ -14,7 +14,7 @@ class DeepSort(object):
     def __init__(self, model_path, max_dist=0.2, use_cuda=True):
         self.min_confidence = 0.3
         self.nms_max_overlap = 0.4
-
+        self.feature_threshold = 0.0393
         self.extractor = Extractor(model_path, use_cuda=use_cuda)
 
         max_cosine_distance = max_dist
@@ -22,13 +22,16 @@ class DeepSort(object):
         metric = NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
         self.tracker = Tracker(metric)
 
-    def update(self, bbox_xywh, confidences, ori_img):
+    def update(self, bbox_xywh, confidences, ori_img, cam):
+        outputs = []
         self.height, self.width = ori_img.shape[:2]
         # generate detections
         features = self._get_features(bbox_xywh, ori_img)
         bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)
-        detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
-
+        if cam == 'Cam4':
+          detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence and np.mean(features[i])<self.feature_threshold]
+        else:
+          detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
         # run on non-maximum supression
         boxes = np.array([d.tlwh for d in detections])
         scores = np.array([d.confidence for d in detections])
@@ -40,7 +43,6 @@ class DeepSort(object):
         self.tracker.update(detections)
 
         # output bbox identities
-        outputs = []
         for track in self.tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue

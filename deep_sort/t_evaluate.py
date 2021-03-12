@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 import numpy as np
 from utils.log import get_logger
-from detectron2_deepsort import Detector
+from deepsort_reid import Detector
 import motmetrics as mm
 
 mm.lap.default_solver = 'lap'
@@ -32,7 +32,7 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
 
             video_path = data_root + '/' + cam + '/' + seq + '/{}_{}.mp4'.format(cam, seq)
             with Detector(args, video_path, result_filename) as det:
-                det.detect()
+                det.detect(cam=cam)
 
             # eval
             logger.info('Evaluate cam: {} seq: {}'.format(cam, seq))
@@ -74,14 +74,14 @@ if __name__ == '__main__':
                 Cam3
                 Cam4
                 Cam5
-
                 '''
     seqs_str = '''      
                   Seq0
                   Seq1
                   Seq2
                   Seq3
-                  Seq4      
+                  Seq4
+
                   '''
     data_root = '/content/Wyze2_marauders_map/data/VideoData'
     cams = [cams.strip() for cams in cams_str.split()]

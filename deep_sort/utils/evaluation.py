@@ -56,9 +56,6 @@ class Evaluator(object):
 
         # get distance matrix
         iou_distance = mm.distances.iou_matrix(gt_tlwhs, trk_tlwhs, max_iou=0.5)
-        print('iou',iou_distance)
-        print('gt',gt_tlwhs)
-        print('trk',trk_tlwhs)
         # acc
         self.acc.update(gt_ids, trk_ids, iou_distance)
 
