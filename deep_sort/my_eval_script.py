@@ -56,9 +56,9 @@ Examples::
     print(features.shape) # output (5, 512)
 """
 #current_cam is which cams data is being input
-def eval_cam(image_dict, current_cam):
-  new_pid_threshold_same_cam = 10
-  new_pid_threshold_diff_cam = 15
+def eval_cam(current_cam, seq_cam):
+  new_pid_threshold_same_cam = 15
+  new_pid_threshold_diff_cam = 20
   matched_ids = []#This is our return vector which will hold all our matched ids
   extractor = FeatureExtractor(
     model_name='osnet_x1_0',
@@ -69,10 +69,20 @@ def eval_cam(image_dict, current_cam):
   #First we check if the saved features dir exists and create it otherwise
   if not os.path.isdir('/content/Wyze2_marauders_map/saved_features'):
     os.mkdir('/content/Wyze2_marauders_map/saved_features')
-
+  #Find the image list
+  image_path = osp.join('/content/Wyze2_marauders_map/result','Cam{}/Seq{}/Cropped/'.format(current_cam,current_cam))
+  image_list = glob.glob(osp.join(image_path, '*.png'))
+  image_dict = {}
+  for i in image_list:
+    names = i.split('_')
+    ids = int(names[2][29:])
+    if ids in image_dict:
+      image_dict[ids].append(i)
+    else:
+      image_dict[ids] = [i]
   #Next we check if the saved features directory is empty
-  old_saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
-  old_num_saved_features_vectors = len(old_saved_features_vectors)
+  # old_saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
+  # old_num_saved_features_vectors = len(old_saved_features_vectors)
   used_id = []
   for identity in image_dict:
     print(identity)
@@ -82,7 +92,7 @@ def eval_cam(image_dict, current_cam):
     saved_features_vectors = glob.glob(osp.join('/content/Wyze2_marauders_map/saved_features', '*.pt'))
     num_saved_features_vectors = len(saved_features_vectors)
     save_location_and_name = osp.join('/content/Wyze2_marauders_map/saved_features', 'features_pid{}_cam{}_track{}.pt'.format(identity, current_cam, num_saved_features_vectors))
-    if old_num_saved_features_vectors < 1:
+    if num_saved_features_vectors < 1:
       #This means saved features directory is empty, save our current feature vector
       torch.save(qf, save_location_and_name)
     else:
@@ -91,7 +101,7 @@ def eval_cam(image_dict, current_cam):
       closest_pid_same_cam = identity
       smallest_dist_diff_cam = 10000 #making this big enough just to check if things are smaller
       smallest_dist_same_cam = 10000
-      for feature_vector in old_saved_features_vectors:
+      for feature_vector in saved_features_vectors:
         gf = torch.load(feature_vector)
         dist = torch.dist(qf, gf, p=2)
         #print("the distance i got was:{}".format(dist))
@@ -115,6 +125,7 @@ def eval_cam(image_dict, current_cam):
         #This must be a new identity
         print("Created a new identity, both thresholds were exceeded")
         torch.save(qf, save_location_and_name)
+        used_id.append(identity)
       elif (smallest_dist_diff_cam < new_pid_threshold_diff_cam):
         #This must be a new identity
         print("matched to a different cam")
@@ -130,5 +141,7 @@ def eval_cam(image_dict, current_cam):
         matched_id = (identity, closest_pid_same_cam) #In this case we must change the matched id
         used_id.append(closest_pid_same_cam)
     matched_ids.append(matched_id) #append the matched identity to our output list
-  #Finally we return the matched ids for usage by the 
+  #Finally we return the matched ids for usage by the
   return matched_ids
+if __name__ == '__main__':
+  print(eval_cam(0,0))

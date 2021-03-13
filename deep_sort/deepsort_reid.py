@@ -11,6 +11,7 @@ from utils.io import write_results
 import numpy as np
 import my_eval_script
 
+
 class Detector(object):
     def __init__(self, args, video_path, result_filename):
         self.args = args
@@ -49,21 +50,36 @@ class Detector(object):
         if exc_type:
             print(exc_type, exc_value, exc_traceback)
 
-    def detect(self, cam=None):
-        count = 0
+    def detect(self, cam=None, seq=None):
+        count1 = 1
+        count2 = 0
         results = []
+        num = 1
         idx_frame = 0
-        store_im = []
         store_bbox = []
         store_ids = []
         store_out = []
         identities_and_images = {}
         cam_num = int(str(cam)[-1])
+        seq_num = int(str(seq)[-1])
+        if not os.path.isdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num)):
+            if not os.path.isdir('/content/Wyze2_marauders_map/result/'):
+                os.mkdir('/content/Wyze2_marauders_map/result/')
+            if not os.path.isdir('/content/Wyze2_marauders_map/result/Cam{}'.format(cam_num)):
+                os.mkdir('/content/Wyze2_marauders_map/result/Cam{}'.format(cam_num))
+            if not os.path.isdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}'.format(cam_num, seq_num)):
+                os.mkdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}'.format(cam_num, seq_num))
+            if not os.path.isdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num)):
+                os.mkdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num))
+        if not os.path.isdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Cropped'.format(cam_num, seq_num)):
+            os.mkdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Cropped'.format(cam_num, seq_num))
         while self.vdo.grab():
             start = time.time()
             _, im = self.vdo.retrieve()
-            store_im.append(im)
-            # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(
+                '/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full/'.format(cam_num, seq_num) + '{}.png'.format(
+                    str(num).zfill(6)), im)
+            num += 1
             bbox_xcycwh, cls_conf, cls_ids = self.detectron2.detect(im)
             if len(bbox_xcycwh) is 0:
                 store_bbox.append(0)
@@ -87,20 +103,32 @@ class Detector(object):
                     for i in range(len(identities)):
                         x1, y1, x2, y2 = bbox_xyxy[i]
                         im_crop = im[y1:y2, x1:x2]
-                        im_crop = np.asarray(im_crop)
-                        if identities[i] in identities_and_images:
-                            identities_and_images[identities[i]].append(im_crop)
-                        else:
-                            identities_and_images[identities[i]] = [im_crop]
-                    end = time.time()
-                    self.logger.info("time: {:.03f}s, fps: {:.03f}, detection numbers: {}, tracking numbers: {}" \
-                                     .format(end - start, 1 / (end - start), bbox_xcycwh.shape[0], len(outputs)))
-        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num)
-        print(matched_ids)
+                        # im_crop = np.asarray(im_crop)
+                        cv2.imwrite('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Cropped/'.format(cam_num,
+                                                                                                      seq_num) + '{}_{}.png'.format(
+                            identities[i], str(count1).zfill(6)), im_crop)
+                        count1 += 1
+                        # if identities[i] in identities_and_images:
+                        #     identities_and_images[identities[i]].append(im_crop)
+                        # else:
+                        #     identities_and_images[identities[i]] = [im_crop]
 
-        for i in range(len(store_im)):
+                    end = time.time()
+                    self.logger.info(
+                        "time: {:.03f}s, fps: {:.03f}, detection numbers: {}, tracking numbers: {}".format(end - start,
+                                                                                                           1 / (
+                                                                                                                       end - start),
+                                                                                                           bbox_xcycwh.shape[
+                                                                                                               0], len(
+                                outputs)))
+        # matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num)
+        matched_ids = my_eval_script.eval_cam(cam_num, seq_num)
+        print(matched_ids)
+        ims = os.listdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num))
+        print(len(ims))
+        for i in range(len(ims)):
             bbox_xcycwh = store_bbox[i]
-            im = store_im[i]
+            im = cv2.imread(ims[i])
             cls_ids = store_ids[i]
             idx_frame += 1
 
@@ -109,8 +137,8 @@ class Detector(object):
                 mask = cls_ids == 0
                 bbox_xcycwh = bbox_xcycwh[mask]
                 bbox_xcycwh[:, 3:] *= 1.2
-                outputs = store_out[count]
-                count += 1
+                outputs = store_out[count2]
+                count2 += 1
                 if len(outputs) > 0:
                     bbox_tlwh = []
                     bbox_xyxy = outputs[:, :4]

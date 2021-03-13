@@ -32,7 +32,7 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
 
             video_path = data_root + '/' + cam + '/' + seq + '/{}_{}.mp4'.format(cam, seq)
             with Detector(args, video_path, result_filename) as det:
-                det.detect(cam=cam)
+                det.detect(cam=cam,seq=seq)
 
             # eval
             logger.info('Evaluate cam: {} seq: {}'.format(cam, seq))

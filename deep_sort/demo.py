@@ -78,7 +78,7 @@ class Detector(object):
                         x1,y1,x2,y2 = bbox_xyxy[i]
                         im_crop = im[y1:y2,x1:x2]
                         im_crop = np.asarray(im_crop)
-                        #cv2.imwrite('/content/drive/MyDrive/EE597/result/cam1_seq0_image/cam0_seq0_id{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
+                        # cv2.imwrite('/content/Wyze2_marauders_map/result/Cam{}/Seq{}'.format(identities[i]) + '_{}.png'.format(count), im_crop)
                         if identities[i] in identities_and_images:
                             identities_and_images[identities[i]].append(im_crop)
                         else:
