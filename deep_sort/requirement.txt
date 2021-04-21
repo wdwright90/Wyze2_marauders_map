@@ -4,6 +4,6 @@ torch==1.7.0
 torchvision==0.8.1
 opencv-python==4.1.2.30
 pyyaml==5.1
-fvcore==0.1.2.post20200910
+fvcore==0.1.3.post20210317
 motmetrics==1.2.0
 lap==0.4.0

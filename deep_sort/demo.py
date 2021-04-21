@@ -83,7 +83,7 @@ class Detector(object):
                             identities_and_images[identities[i]].append(im_crop)
                         else:
                             identities_and_images[identities[i]] = [im_crop]
-        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num, flag = 0)
+        matched_ids = my_eval_script.eval_cam(identities_and_images, cam_num)
         print(matched_ids)
         # loop for generate video with matched_ids
         for i in range(len(store_im)):
@@ -104,6 +104,7 @@ class Detector(object):
                         for old_id, new_id in matched_ids: # matched_ids part list
                             if old_id == identities[i]:
                                 identities[i] = new_id
+                                break
                     im = draw_bboxes(im, bbox_xyxy, identities)
             if self.spath:
                 self.output.write(im)
@@ -124,7 +125,7 @@ class Detector(object):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
+    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/new3ckpt_30epochs.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()

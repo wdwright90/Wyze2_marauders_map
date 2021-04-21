@@ -13,12 +13,13 @@ import my_eval_script
 
 
 class Detector(object):
-    def __init__(self, args, video_path, result_filename):
+    def __init__(self, args, video_path, spath, result_filename):
         self.args = args
         self.video_path = video_path
         self.logger = get_logger("root")
-        self.result_filename = result_filename
         use_cuda = bool(strtobool(self.args.use_cuda))
+        self.spath = spath
+        self.result_filename = result_filename
 
         self.vdo = cv2.VideoCapture()
         self.detectron2 = Detectron2()
@@ -31,17 +32,15 @@ class Detector(object):
         self.im_width = int(self.vdo.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.im_height = int(self.vdo.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        if self.args.save_path:
-            os.makedirs(self.args.save_path, exist_ok=True)
+        os.makedirs(self.args.save_path, exist_ok=True)
 
-            # path of saved video and results
-            self.save_video_path = os.path.join(self.args.save_path, "results.avi")
-            self.save_results_path = os.path.join(self.args.save_path, "results.txt")
+        # path of saved video and results
 
+        if self.spath:
             fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-            self.output = cv2.VideoWriter(self.args.save_path, fourcc, 15, (self.im_width, self.im_height))
+            self.output = cv2.VideoWriter(self.spath, fourcc, 15, (self.im_width, self.im_height))
 
-            self.logger.info("Save results to {}".format(self.args.save_path))
+        self.logger.info("Save videos to {}".format(self.args.save_path))
 
         assert self.vdo.isOpened()
         return self
@@ -117,7 +116,7 @@ class Detector(object):
                     self.logger.info(
                         "time: {:.03f}s, fps: {:.03f}, detection numbers: {}, tracking numbers: {}".format(end - start,
                                                                                                            1 / (
-                                                                                                                       end - start),
+                                                                                                                   end - start),
                                                                                                            bbox_xcycwh.shape[
                                                                                                                0], len(
                                 outputs)))
@@ -125,13 +124,15 @@ class Detector(object):
         matched_ids = my_eval_script.eval_cam(cam_num, seq_num)
         print(matched_ids)
         ims = os.listdir('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num))
+        ims.sort(key=lambda x: int(x[:-4]))
         print(len(ims))
         for i in range(len(ims)):
             bbox_xcycwh = store_bbox[i]
-            im = cv2.imread(ims[i])
+            impath = os.path.join('/content/Wyze2_marauders_map/result/Cam{}/Seq{}/Full'.format(cam_num, seq_num),
+                                  ims[i])
+            im = cv2.imread(impath)
             cls_ids = store_ids[i]
             idx_frame += 1
-
             if bbox_xcycwh is not 0:
                 # select class person
                 mask = cls_ids == 0
@@ -147,14 +148,15 @@ class Detector(object):
                         for old_id, new_id in matched_ids:  # matched_ids part list
                             if old_id == identities[i]:
                                 identities[i] = new_id
+                                break
                     im = draw_bboxes(im, bbox_xyxy, identities)
                     for bb_xyxy in bbox_xyxy:
                         bbox_tlwh.append(self.deepsort._xyxy_to_tlwh(bb_xyxy))
                     results.append((idx_frame - 1, bbox_tlwh, identities))
 
-                if self.args.save_path:
-                    self.output.write(im)
                 write_results(self.result_filename, results, 'mot')
+            if self.spath:
+                self.output.write(im)
 
 
 def parse_args():
