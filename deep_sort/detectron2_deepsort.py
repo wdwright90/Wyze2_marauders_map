@@ -86,7 +86,7 @@ class Detector(object):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/ckpt.t7")
+    parser.add_argument("--checkpoint", type=str, default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/new3ckpt_30epochs.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()
