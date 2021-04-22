@@ -7,4 +7,3 @@ pyyaml==5.1
 fvcore==0.1.3.post20210317
 motmetrics==1.2.0
 lap==0.4.0
-opencv-python==4.5.1.48
