@@ -62,7 +62,7 @@ def main(data_root='', cams=('',), seqs=('',), args=""):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', type=str,
-                        default='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/new3ckpt_30epochs.t7')
+                        default='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/newckpt.t7')
     parser.add_argument('--save_path', type=str, default='/content/Wyze2_marauders_map/evaluation')
     parser.add_argument('--use_cuda', type=str, default='True')
     return parser.parse_args()
@@ -75,7 +75,6 @@ if __name__ == '__main__':
                 Cam1
                 Cam2
                 Cam3
-                
 
                 '''
     seqs_str = '''      

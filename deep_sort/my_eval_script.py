@@ -65,12 +65,11 @@ def eval_cam(current_cam, seq_cam):
     model_path='/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/model.pth.tar-10',
     device='cuda'
   )
-
   #First we check if the saved features dir exists and create it otherwise
   if not os.path.isdir('/content/Wyze2_marauders_map/saved_features'):
     os.mkdir('/content/Wyze2_marauders_map/saved_features')
   #Find the image list
-  image_path = osp.join('/content/Wyze2_marauders_map/result','Cam{}/Seq{}/Cropped/'.format(current_cam,current_cam))
+  image_path = osp.join('/content/Wyze2_marauders_map/result','Cam{}/Seq{}/Cropped/'.format(current_cam,seq_cam))
   image_list = glob.glob(osp.join(image_path, '*.png'))
   image_dict = {}
   for i in image_list:
