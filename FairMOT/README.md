@@ -1,6 +1,5 @@
 Working in google drive
 ## Installation
-* Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
 * Install dependencies. We use python 3.7 and pytorch >= 1.2.0
 ```
 pip install -r requirements.txt
