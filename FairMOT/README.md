@@ -1,48 +1,37 @@
-
+Working in google drive
 ## Installation
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
 * Install dependencies. We use python 3.7 and pytorch >= 1.2.0
 ```
-conda create -n FairMOT
-conda activate FairMOT
-conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
-cd ${FAIRMOT_ROOT}
 pip install -r requirements.txt
 ```
 * We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
 ```
-git clone https://github.com/CharlesShang/DCNv2
-cd DCNv2
-./make.sh
+!git clone https://github.com/CharlesShang/DCNv2
+!pip install -U torch==1.4 torchvision==0.5 -f https://download.pytorch.org/whl/cu101/torch_stable.html
+%cd DCNv2
+!bash ./make.sh
 ```
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
 
 ## Data preparation
 
+You should prepare the data in the following structure:
+```
+MOT16
+   |——————images
+   |        └——————train
+   |        └——————test
+   └——————labels_with_ids
+            └——————train(empty)
 
-* **2DMOT15 and MOT20** 
-[2DMOT15](https://motchallenge.net/data/2D_MOT_2015/) and [MOT20](https://motchallenge.net/data/MOT20/) can be downloaded from the official webpage of MOT challenge. After downloading, you should prepare the data in the following structure:
 ```
-MOT15
-   |——————images
-   |        └——————train
-   |        └——————test
-   └——————labels_with_ids
-            └——————train(empty)
-MOT20
-   |——————images
-   |        └——————train
-   |        └——————test
-   └——————labels_with_ids
-            └——————train(empty)
-```
-Then, you can change the seq_root and label_root in src/gen_labels_15.py and src/gen_labels_20.py and run:
+Then, you can change the seq_root and label_root in src/gen_labels_16.py and run:
 ```
 cd src
-python gen_labels_15.py
-python gen_labels_20.py
+python gen_labels_16.py
 ```
-to generate the labels of 2DMOT15 and MOT20. The seqinfo.ini files of 2DMOT15 can be downloaded here [[Google]](https://drive.google.com/open?id=1kJYySZy7wyETH4fKMzgJrYUrTfxKlN1w), [[Baidu],code:8o0w](https://pan.baidu.com/s/1zb5tBW7-YTzWOXpd9IzS0g).
+
 
 ## Pretrained models and baseline model
 * **Pretrained models**
@@ -71,82 +60,26 @@ ${FAIRMOT_ROOT}
            └——————model_10_slowlearning.pth
 ```
 
-## Training
-* Download the training data
-* Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
-* Pretrain on CrowdHuman and train on MIX:
-```
-sh experiments/crowdhuman_dla34.sh
-sh experiments/mix_ft_ch_dla34.sh
-```
-* Only train on MIX:
-```
-sh experiments/mix_dla34.sh
-```
-* Only train on MOT17:
-```
-sh experiments/mot17_dla34.sh
-```
-* Finetune on 2DMOT15 using the baseline model:
-```
-sh experiments/mot15_ft_mix_dla34.sh
-```
-* Finetune on MOT20 using the baseline model:
-```
-sh experiments/mot20_ft_mix_dla34.sh
-```
-* For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
-```
-sh experiments/mix_mot17_half_dla34.sh
-sh experiments/mix_mot17_half_hrnet18.sh
-sh experiments/mix_mot17_half_res34.sh
-sh experiments/mix_mot17_half_res34fpn.sh
-sh experiments/mix_mot17_half_res50.sh
-```
-The ablation study model 'mix_mot17_half_dla34.pth' can be downloaded here: [[Google]](https://drive.google.com/file/d/1dJDGSa6-FMq33XY-cOd_nYxuilv30YDM/view?usp=sharing) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/ESh1SlUvZudKgUX4A8E3yksBhfRHIf2AsKaaPJ-v_5lVAw?e=NB6UHR) [[Baidu, code:iifa]](https://pan.baidu.com/s/1RQD8ik1labWuwd8jJ-0ukQ).
-* Performance on the test set of MOT17 when using different training data:
-
-| Training Data    |  MOTA | IDF1 | IDS     |
-|--------------|-----------|--------|-------|
-|MOT17  | 69.8 | 69.9 | 3996                |
-|MIX       | 72.9 | 73.2 | 3345             |
-|CrowdHuman + MIX     | 73.7 | 72.3 | 3303  |
-
-## Tracking
-* The default settings run tracking on the validation dataset from 2DMOT15. Using the baseline model, you can run:
-```
-cd src
-python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.6
-```
-to see the tracking results (76.5 MOTA and 79.3 IDF1 using the baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
-* For ablation study, we evaluate on the other half of the training set of MOT17, you can run:
-```
-cd src
-python track_half.py mot --load_model ../exp/mot/mix_mot17_half_dla34.pth --conf_thres 0.4 --val_mot17 True
-```
-If you use our pretrained model 'mix_mot17_half_dla34.pth', you can get 69.1 MOTA and 72.8 IDF1. 
-* To get the txt results of the test set of MOT16 or MOT17, you can run:
-```
-cd src
-python track.py mot --test_mot17 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
-python track.py mot --test_mot16 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
-```
-and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 73+ MOTA on MOT17 test set using the baseline model 'fairmot_dla34.pth'.)
-
-* To get the SOTA results of 2DMOT15 and MOT20, run the tracking code:
-```
-cd src
-python track.py mot --test_mot15 True --load_model your_mot15_model.pth --conf_thres 0.3
-python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3
-```
-Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. 
-
 ## Train on custom dataset
 You can train FairMOT on custom dataset by following several steps bellow:
 1. Generate one txt label file for one image. Each line of the txt label file represents one object. The format of the line is: "class id x_center/img_width y_center/img_height w/img_width h/img_height". You can modify src/gen_labels_16.py to generate label files for your custom dataset.
 2. Generate files containing image paths. The example files are in src/data/. Some similar code can be found in src/gen_labels_crowd.py
 3. Create a json file for your custom dataset in src/lib/cfg/. You need to specify the "root" and "train" keys in the json file. You can find some examples in src/lib/cfg/.
 4. Add --data_cfg '../src/lib/cfg/your_dataset.json' when training. 
+5. 
+## Training
+* Download and get the training data
+* Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
+* run python /content/FairMOT/src/train.py mot --data_cfg '../src/lib/cfg/your_dataset.json'
+
+## Tracking
+# Pretrained
+* Do not forget to change the path of the root for the dataset, and cam_str and the seqs_str in track.py before you run:
+python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
+* To track our retrained model run:
+python track.py mot --load_model ../models/model_10_slowlearning.pth --conf_thres 0.7
+
+
 
 ## Acknowledgement
 A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https://github.com/Zhongdao/Towards-Realtime-MOT) and [xingyizhou/CenterNet](https://github.com/xingyizhou/CenterNet). Thanks for their wonderful works.
