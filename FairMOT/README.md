@@ -38,7 +38,7 @@ cd src
 python gen_labels_16.py
 ```
 
-
+# Pretrained
 ## Pretrained models and baseline model
 * **Pretrained models**
 
@@ -72,10 +72,12 @@ ${FAIRMOT_ROOT}
 * run python /content/FairMOT/src/train.py mot --data_cfg '../src/lib/cfg/your_dataset.json'
 
 ## Tracking
-# Pretrained
+
 * Do not forget to change the path of the root for the dataset, and cam_str and the seqs_str in track.py before you run:
+* ```
 python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
 * To track our retrained model run:
+```
 python track.py mot --load_model ../models/model_10_slowlearning.pth --conf_thres 0.7
 
 
