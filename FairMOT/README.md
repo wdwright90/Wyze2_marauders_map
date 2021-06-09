@@ -74,12 +74,13 @@ ${FAIRMOT_ROOT}
 ## Tracking
 
 * Do not forget to change the path of the root for the dataset, and cam_str and the seqs_str in track.py before you run:
-* ```
+```
 python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
+```
 * To track our retrained model run:
 ```
 python track.py mot --load_model ../models/model_10_slowlearning.pth --conf_thres 0.7
-
+```
 
 
 ## Acknowledgement
