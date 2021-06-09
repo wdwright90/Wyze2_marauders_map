@@ -28,7 +28,7 @@ dataset
 python train.py --data-dir 'root of the dataset'
 ```
 ## Pretrained and retrained model
-The pretrained model named ckpt.t7 and the retrained model named newckpt.t7 under the checkpoints filder
+The pretrained model named ckpt.t7 and the retrained model named newckpt.t7 under the checkpoints folder
 
 ## Track
 * You need to changed the data_root, cams_str and seqs_str in t_evaluate.py.
