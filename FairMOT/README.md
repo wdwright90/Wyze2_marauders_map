@@ -32,6 +32,13 @@ You should prepare the data in the following structure:
 MOT16
    |——————images
    |        └——————train
+                     └——————Cam0_Seq0
+                              └——————gt
+                                       └——————gt.txt
+                              └——————im
+                                       └——————000001.jpg
+                                       ...
+                     ...
    |        └——————test
    └——————labels_with_ids
             └——————train(empty)
