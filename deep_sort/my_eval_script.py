@@ -7,6 +7,7 @@ import os.path as osp
 import numpy as np
 sys.path.append("/content/Wyze2_marauders_map/REID_model/deep-person-reid")
 import torch
+import shutil
 
 from torchreid.utils import FeatureExtractor
 from torchreid.metrics import compute_distance_matrix
@@ -141,6 +142,7 @@ def eval_cam(current_cam, seq_cam):
         used_id.append(closest_pid_same_cam)
     matched_ids.append(matched_id) #append the matched identity to our output list
   #Finally we return the matched ids for usage by the
+  shutil.rmtree(image_path)
   return matched_ids
 if __name__ == '__main__':
   print(eval_cam(0,0))

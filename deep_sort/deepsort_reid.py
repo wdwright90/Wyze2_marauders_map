@@ -10,7 +10,7 @@ from utils.log import get_logger
 from utils.io import write_results
 import numpy as np
 import my_eval_script
-
+import shutil
 
 class Detector(object):
     def __init__(self, args, video_path, spath, result_filename):
@@ -148,12 +148,13 @@ class Detector(object):
                 write_results(self.result_filename, results, 'mot')
             if self.spath:
                 self.output.write(im)
+        shutil.rmtree(ims)
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("VIDEO_PATH", type=str)
     parser.add_argument("--checkpoint", type=str,
-                        default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/new3ckpt_30epochs.t7")
+                        default="/content/Wyze2_marauders_map/deep_sort/deep_sort/checkpoint/newckpt.t7")
     parser.add_argument("--save_path", type=str, default="/content/")
     parser.add_argument("--use_cuda", type=str, default="True")
     return parser.parse_args()
