@@ -12,7 +12,13 @@ pip install -r requirements.txt
 !bash ./make.sh
 ```
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
-* 
+# Train
+
+## Training
+* Download and get the training data
+* Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
+* run python /content/FairMOT/src/train.py mot --data_cfg '../src/lib/cfg/your_dataset.json'
+
 ## Train on custom dataset
 You can train FairMOT on custom dataset by following several steps bellow:
 1. Generate one txt label file for one image. Each line of the txt label file represents one object. The format of the line is: "class id x_center/img_width y_center/img_height w/img_width h/img_height". You can modify src/gen_labels_16.py to generate label files for your custom dataset.
@@ -21,7 +27,6 @@ You can train FairMOT on custom dataset by following several steps bellow:
 4. Add --data_cfg '../src/lib/cfg/your_dataset.json' when training. 
 5. 
 ## Data preparation
-
 You should prepare the data in the following structure:
 ```
 MOT16
@@ -66,13 +71,9 @@ ${FAIRMOT_ROOT}
            └——————model_10_slowlearning.pth
 ```
 
-## Training
-* Download and get the training data
-* Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
-* run python /content/FairMOT/src/train.py mot --data_cfg '../src/lib/cfg/your_dataset.json'
+
 
 ## Testing
-
 * Do not forget to change the path of the root for the dataset, and cam_str and the seqs_str in track.py before you run:
 ```
 python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
