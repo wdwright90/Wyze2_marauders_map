@@ -1,39 +1,3 @@
-# FairMOT
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-simple-baseline-for-multi-object-tracking/multi-object-tracking-on-2dmot15-1)](https://paperswithcode.com/sota/multi-object-tracking-on-2dmot15-1?p=a-simple-baseline-for-multi-object-tracking)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-simple-baseline-for-multi-object-tracking/multi-object-tracking-on-mot16)](https://paperswithcode.com/sota/multi-object-tracking-on-mot16?p=a-simple-baseline-for-multi-object-tracking)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-simple-baseline-for-multi-object-tracking/multi-object-tracking-on-mot17)](https://paperswithcode.com/sota/multi-object-tracking-on-mot17?p=a-simple-baseline-for-multi-object-tracking)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-simple-baseline-for-multi-object-tracking/multi-object-tracking-on-mot20-1)](https://paperswithcode.com/sota/multi-object-tracking-on-mot20-1?p=a-simple-baseline-for-multi-object-tracking)
-
-A simple baseline for one-shot multi-object tracking:
-![](assets/pipeline.png)
-> [**FairMOT: On the Fairness of Detection and Re-Identification in Multiple Object Tracking**](http://arxiv.org/abs/2004.01888),            
-> Yifu Zhang, Chunyu Wang, Xinggang Wang, Wenjun Zeng, Wenyu Liu,        
-> *arXiv technical report ([arXiv 2004.01888](http://arxiv.org/abs/2004.01888))*
-## Abstract
-There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
-
-## News
-* (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
-
-## Main updates
-* We pretrain FairMOT on the CrowdHuman dataset using a self-supervised learning approach.
-* To detect bounding boxes outside the image, we use left, top, right and bottom (4 channel) to replace the WH head (2 channel). 
-
-## Tracking performance
-### Results on MOT challenge test set
-| Dataset    |  MOTA | IDF1 | IDS | MT | ML | FPS |
-|--------------|-----------|--------|-------|----------|----------|--------|
-|2DMOT15  | 60.6 | 64.7 |  591 | 47.6% | 11.0% | 30.5 |
-|MOT16       | 74.9 | 72.8 | 1074 | 44.7% | 15.9% | 25.9 |
-|MOT17       | 73.7 | 72.3 | 3303 | 43.2% | 17.3% | 25.9 |
-|MOT20       | 61.8 | 67.3 | 5243 | 68.8% | 7.6% | 13.2 |
-
- All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT16, MOT17 and  MOT20. The tracking speed of the entire system can reach up to **30 FPS**.
-
-### Video demos on MOT challenge test set
-<img src="assets/MOT15.gif" width="400"/>   <img src="assets/MOT16.gif" width="400"/>
-<img src="assets/MOT17.gif" width="400"/>   <img src="assets/MOT20.gif" width="400"/>
-
 
 ## Installation
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
@@ -55,26 +19,7 @@ cd DCNv2
 
 ## Data preparation
 
-* **CrowdHuman**
-The CrowdHuman dataset can be downloaded from their [official webpage](https://www.crowdhuman.org). After downloading, you should prepare the data in the following structure:
-```
-crowdhuman
-   |——————images
-   |        └——————train
-   |        └——————val
-   └——————labels_with_ids
-   |         └——————train(empty)
-   |         └——————val(empty)
-   └------annotation_train.odgt
-   └------annotation_val.odgt
-```
-Then, you can change the paths in src/gen_labels_crowd.py and run:
-```
-cd src
-python gen_labels_crowd.py
-```
-* **MIX**
-We use the same training data as [JDE](https://github.com/Zhongdao/Towards-Realtime-MOT) in this part and we call it "MIX". Please refer to their [DATA ZOO](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) to download and prepare all the training data including Caltech Pedestrian, CityPersons, CUHK-SYSU, PRW, ETHZ, MOT17 and MOT16. 
+
 * **2DMOT15 and MOT20** 
 [2DMOT15](https://motchallenge.net/data/2D_MOT_2015/) and [MOT20](https://motchallenge.net/data/MOT20/) can be downloaded from the official webpage of MOT challenge. After downloading, you should prepare the data in the following structure:
 ```
@@ -117,12 +62,13 @@ ${FAIRMOT_ROOT}
 Our baseline FairMOT model (DLA-34 backbone) is pretrained on the CrowdHuman for 60 epochs with the self-supervised learning approach and then trained on the MIX dataset for 30 epochs. The models can be downloaded here: 
 crowdhuman_dla34.pth [[Google]](https://drive.google.com/file/d/1SFOhg_vos_xSYHLMTDGFVZBYjo8cr2fG/view?usp=sharing) [[Baidu, code:ggzx ]](https://pan.baidu.com/s/1JZMCVDyQnQCa5veO73YaMw) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/EUsj0hkTNuhKkj9bo9kE7ZsBpmHvqDz6DylPQPhm94Y08w?e=3OF4XN).
 fairmot_dla34.pth [[Google]](https://drive.google.com/file/d/1iqRQjsG9BawIl8SlFomMg5iwkb6nqSpi/view?usp=sharing) [[Baidu, code:uouv]](https://pan.baidu.com/s/1H1Zp8wrTKDk20_DSPAeEkg) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/EWHN_RQA08BDoEce_qFW-ogBNUsb0jnxG3pNS3DJ7I8NmQ?e=p0Pul1). (This is the model we get 73.7 MOTA on the MOT17 test set. )
+model_10_slowlearning.pth [[Google]](https://drive.google.com/file/d/11PPLzausTmblY-uyVbgwhgL026gv3POv/view?usp=sharing). (This is model for our dataset)
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
    └——————models
            └——————fairmot_dla34.pth
-           └——————...
+           └——————model_10_slowlearning.pth
 ```
 
 ## Training
@@ -194,15 +140,6 @@ python track.py mot --test_mot15 True --load_model your_mot15_model.pth --conf_t
 python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3
 ```
 Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. 
-
-## Demo
-You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
-```
-cd src
-python demo.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
-```
-You can change --input-video and --output-root to get the demos of your own videos.
---conf_thres can be set from 0.3 to 0.7 depending on your own videos.
 
 ## Train on custom dataset
 You can train FairMOT on custom dataset by following several steps bellow:
