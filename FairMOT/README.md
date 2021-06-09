@@ -71,7 +71,7 @@ ${FAIRMOT_ROOT}
 * Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
 * run python /content/FairMOT/src/train.py mot --data_cfg '../src/lib/cfg/your_dataset.json'
 
-## Tracking
+## Testing
 
 * Do not forget to change the path of the root for the dataset, and cam_str and the seqs_str in track.py before you run:
 ```
