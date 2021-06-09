@@ -65,7 +65,7 @@ You can train FairMOT on custom dataset by following several steps bellow:
 2. Generate files containing image paths. The example files are in src/data/. Some similar code can be found in src/gen_labels_crowd.py
 3. Create a json file for your custom dataset in src/lib/cfg/. You need to specify the "root" and "train" keys in the json file. You can find some examples in src/lib/cfg/.
 4. Add --data_cfg '../src/lib/cfg/your_dataset.json' when training. 
-5. 
+
 ## Training
 * Download and get the training data
 * Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
